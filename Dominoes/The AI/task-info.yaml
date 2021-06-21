@@ -365,5 +365,9 @@ files:
         TestStage5('dominoes.dominoes').run_tests()
   learner_created: false
 feedback_link: https://hyperskill.org/projects/146/stages/790/implement#comment
-status: Unchecked
-record: -1
+status: Solved
+feedback:
+  message: Well done! You finished the project. Select a new project on <a href="https://hyperskill.org/projects">JetBrains
+    Academy</a> to continue learning.
+  time: Mon, 21 Jun 2021 12:46:00 UTC
+record: 4

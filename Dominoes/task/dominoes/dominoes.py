@@ -35,23 +35,28 @@ def print_field():
     print(output)
 
 
-def game_result():
-    results = ["Status: The game is over. You won!",
-               "Status: The game is over. The computer won!",
-               "Status: The game is over. It's a draw!"]
-    print(random.choice(results))
-
-
 def computer_move():
     global stock, computer, snake
-    if len(computer) < 2 and len(stock) > 0:
+    ratings = []
+    for index in range(len(computer)):
+        first = str(computer[index][0])
+        second = str(computer[index][1])
+        ratings.append([index, str(snake).count(first) + str(snake).count(second)
+                        + str(computer).count(first) + str(computer).count(second)])
+    ratings = sorted(ratings, key=lambda tup: tup[1], reverse=True)
+
+    for _ in range(len(ratings)):
+        index = ratings[_][0]
+        if check_move(computer[index], "left"):
+            place_domino(computer.pop(index), "left")
+            return True
+        if check_move(computer[index], "right"):
+            place_domino(computer.pop(index), "right")
+            return True
+    if len(stock) > 0:
         computer.append(stock.pop(random.randrange(len(stock))))
-        return
-    move_ = random.choice(range(1, len(computer) + 1)) * random.choice([-1, 1])
-    if move_ < 0:
-        snake.insert(0, computer.pop(abs(move_) - 1))
-    else:
-        snake.append(computer.pop(abs(move_) - 1))
+        return True
+    return False
 
 
 def player_move(move_):
@@ -72,12 +77,15 @@ def player_move(move_):
         return False
     if move_ < 0:
         if check_move(player[abs(move_) - 1], "left"):
-            snake.insert(0, player.pop(abs(move_) - 1))
+            # snake.insert(0, player.pop(abs(move_) - 1))
+            place_domino(player.pop(abs(move_) - 1), "left")
             return True
     else:
-        if check_move(player[abs(move_) - 1], "left"):
-            snake.append(player.pop(abs(move_) - 1))
+        if check_move(player[abs(move_) - 1], "right"):
+            # snake.append(player.pop(abs(move_) - 1))
+            place_domino(player.pop(abs(move_) - 1), "right")
             return True
+    print("Illegal move. Please try again")
     return False
 
 
@@ -92,13 +100,27 @@ def check_move(domino, side):
     return False
 
 
+def place_domino(domino, side):
+    global snake
+    if side == "left":
+        if snake[0][0] == domino[1]:
+            snake.insert(0, domino)
+        else:
+            snake.insert(0, domino[::-1])
+    if side == "right":
+        if snake[-1][1] == domino[0]:
+            snake.append(domino)
+        else:
+            snake.append(domino[::-1])
+
+
 random.seed(100504)
 dominoes_list = [[0, 0], [0, 1], [1, 1], [1, 2], [1, 3], [1, 4], [1, 5], [1, 6],
-            [0, 2], [2, 2], [2, 3], [2, 4], [2, 5], [2, 6],
-            [0, 3], [3, 3], [3, 4], [3, 5], [3, 6],
-            [0, 4], [4, 4], [4, 5], [4, 6],
-            [0, 5], [5, 5], [5, 6],
-            [0, 6], [6, 6]]
+                 [0, 2], [2, 2], [2, 3], [2, 4], [2, 5], [2, 6],
+                 [0, 3], [3, 3], [3, 4], [3, 5], [3, 6],
+                 [0, 4], [4, 4], [4, 5], [4, 6],
+                 [0, 5], [5, 5], [5, 6],
+                 [0, 6], [6, 6]]
 
 stock = []
 player = []
@@ -127,7 +149,19 @@ while True:
     print("Computer pieces: {}".format(len(computer)))
     print()
     print_field()
+
     print()
+
+    if len(player) == 0:
+        print("Status: The game is over. You won!")
+        break
+    if len(computer) == 0:
+        print("Status: The game is over. The computer won!")
+        break
+    if len(stock) == 0:
+        "Status: The game is over. It's a draw!"
+        break
+
     print("Your pieces:")
 
     for dom in range(len(player)):
@@ -142,11 +176,4 @@ while True:
             continue
     else:
         computer_move()
-    if len(player) == 0 or len(computer) == 0 or len(stock) == 0:
-        break
-    if snake[0][0] == snake[-1][1]:
-        if str(snake).count(str(snake[0][0])) == 8:
-            break
     status = "player" if status == "computer" else "computer"
-
-game_result()
